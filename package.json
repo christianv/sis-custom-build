@@ -26,8 +26,9 @@
     "node": "0.10.36"
   },
   "dependencies": {
-    "express": "^4.12.2",
+    "adm-zip": "^0.4.7",
     "chalk": "^1.0.0",
+    "express": "^4.12.2",
     "serve-index": "^1.6.2",
     "shelljs": "^0.3.0"
   }
