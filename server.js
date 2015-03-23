@@ -1,97 +1,125 @@
-var express = require('express');
-var path = require('path');
-var app = express();
-var http = require('http');
-var server = http.createServer(app);
-var env = process.env.NODE_ENV || 'development';
-var shell = require('shelljs');
-var chalk = require('chalk');
-var serveIndex = require('serve-index');
+(function() {
+  'use strict';
 
-/**
- * Make sure we only pass data over https
- */
-var forceSSL = function(req, res, next) {
-  if (req.headers['x-forwarded-proto'] !== 'https') {
-    return res.redirect(['https://', req.get('Host'), req.url].join(''));
+  var express = require('express');
+  var app = express();
+  var http = require('http');
+  var server = http.createServer(app);
+  var env = process.env.NODE_ENV || 'development';
+  var shell = require('shelljs');
+  var chalk = require('chalk');
+  var serveIndex = require('serve-index');
+  var Admzip = require('adm-zip');
+
+  /**
+   * Make sure we only pass data over https
+   */
+  var forceSSL = function(req, res, next) {
+    if (req.headers['x-forwarded-proto'] !== 'https') {
+      return res.redirect(['https://', req.get('Host'), req.url].join(''));
+    }
+    return next();
+  };
+
+  // When in production, force SSL
+  if (env === 'production') {
+    app.use(forceSSL);
   }
-  return next();
-};
 
-// When in production, force SSL
-if (env === 'production') {
-  app.use(forceSSL);
-}
+  // List public for the static assets
+  app.use('/dist', serveIndex(__dirname + '/dist', {'icons': true}));
 
-// List public for the static assets
-app.use('/dist', serveIndex(__dirname + '/dist', {'icons': true}));
+  /**
+   * Echo console.log messages in a unified way
+   */
+  var echo = function(message) {
+    shell.echo(chalk.green('Build: ') + message);
+  };
 
-var echo = function(message) {
-  shell.echo(chalk.green('Build: ') + message);
-};
+  /**
+   * Creating the zip file
+   * @return {[type]} [description]
+   */
+  var createZip = function() {
+    echo('Creating the zip file');
 
-var build = function() {
-  echo('Start ...');
+    var zip = new Admzip();
+    zip.addLocalFolder('dist');
+    zip.writeZip('dist/files_latest.zip');
+  };
 
-  if (shell.test('-d', 'x-sis-custom')) {
-    echo('Repo update');
-    shell.cd('x-sis-custom');
-    shell.exec('git pull');
+  /**
+   * The build command
+   *   - Fetch the latest code
+   *   - Run a gulp build
+   *   - Copy the build dir to the public directory
+   */
+  var build = function() {
+    echo('Start ...');
 
-    echo('Repo update dependencies');
-    shell.exec('npm install');
+    if (shell.test('-d', 'x-sis-custom')) {
+      echo('Repo update');
+      shell.cd('x-sis-custom');
+      shell.exec('git pull');
 
-    echo('Gulp build - Start');
-    shell.exec('npm run build');
+      echo('Repo update dependencies');
+      shell.exec('npm install');
 
-    echo('Copy dist directory');
-    shell.cd('..');
-    shell.exec('cp -TRv x-sis-custom/dist dist');
+      echo('Gulp build - Start');
+      shell.exec('npm run build');
 
-    app.use('/dist', express.static(__dirname + '/dist'));
-  } else {
-    echo(chalk.red('Initial fetch step is still happening'));
-  }
-};
+      echo('Copy dist directory');
+      shell.cd('..');
+      shell.exec('cp -Rv x-sis-custom/dist dist');
 
-// Listen to the /api/build
-app.post('/api/build', function(req, res) {
-  build();
-  res.json({
-    'status': 'ok'
-  });
-});
+      createZip();
 
-// Listen to the /ping
-app.get('/api/ping', function(req, res) {
-  res.json({
-    'status': 'ok'
-  });
-});
+      app.use('/dist', express.static(__dirname + '/dist'));
+    } else {
+      echo(chalk.red('Initial fetch step is still happening'));
+    }
+  };
 
-var fetch = function() {
-  if (!shell.test('-d', 'x-sis-custom') && !shell.test('-d', 'z-sis-custom')) {
-    echo('Fetch - Repo clone - Start');
-    shell.exec('git clone --depth 1 https://github.com/ucberkeley/sis-custom.git z-sis-custom');
-
-    echo('Fetch - Install packages');
-    shell.cd('z-sis-custom');
-    shell.exec('npm install');
-    echo('Fetch - Packages installed');
-    shell.cd('..');
-    shell.mv('z-sis-custom', 'x-sis-custom');
+  // Will fire the build command
+  app.post('/api/build', function(req, res) {
     build();
-  }
-};
+    res.json({
+      'status': 'ok'
+    });
+  });
 
-var port = process.env.PORT || 5000;
-server.listen(port);
-server.on('listening', function() {
-  console.log('Express server started on port %s at %s', server.address().port, server.address().address);
+  // Listen to a ping
+  // We use this for uptimerobot
+  app.get('/api/ping', function(req, res) {
+    res.json({
+      'status': 'ok'
+    });
+  });
 
-  // Clean up previous directories
-  shell.exec('rm -r dist x-sis-custom z-sis-custom');
+  var fetch = function() {
+    if (!shell.test('-d', 'x-sis-custom') && !shell.test('-d', 'z-sis-custom')) {
+      echo('Fetch - Repo clone - Start');
+      shell.exec('git clone --depth 1 https://github.com/ucberkeley/sis-custom.git z-sis-custom');
 
-  // Initial Fetch
-  fetch();
-});
+      echo('Fetch - Install packages');
+      shell.cd('z-sis-custom');
+      shell.exec('npm install');
+      echo('Fetch - Packages installed');
+      shell.cd('..');
+      shell.mv('z-sis-custom', 'x-sis-custom');
+      build();
+    }
+  };
+
+  var port = process.env.PORT || 5000;
+  server.listen(port);
+  server.on('listening', function() {
+    console.log('Express server started on port %s at %s', server.address().port, server.address().address);
+
+    // Clean up previous directories
+    shell.exec('rm -r dist x-sis-custom z-sis-custom');
+
+    // Initial Fetch
+    fetch();
+  });
+})();
