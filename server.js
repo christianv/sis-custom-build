@@ -70,7 +70,7 @@
 
       echo('Copy dist directory');
       shell.cd('..');
-      shell.exec('cp -Rv x-sis-custom/dist dist');
+      shell.exec('cp -TRv x-sis-custom/dist dist');
 
       createZip();
 
