@@ -1,7 +1,9 @@
 # SIS Custom - [![Build Status](https://travis-ci.org/ucberkeley/sis-custom-build.svg?branch=master)](https://travis-ci.org/ucberkeley/sis-custom-build)
 
-Serve the assets for [sis-custom](https://github.com/ucberkeley/sis-custom) at
-http://sis-custom-build.herokuapp.com/dist
+Serve the assets for [sis-custom](https://github.com/ucberkeley/sis-custom)
+
+* [List of files](https://sis-custom-build.herokuapp.com/dist)
+* [Zip file](https://sis-custom-build.herokuapp.com/dist/files_latest.zip)
 
 ## Installation
 
