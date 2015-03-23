@@ -5,7 +5,18 @@ http://sis-custom-build.herokuapp.com/dist
 
 ## Installation
 
-### Heroku
+### Requirements
+
+* [NodeJS](https://nodejs.org/)
+* [Gulp](http://gulpjs.com/)
+
+### Start the server locally
+
+```
+node server.js
+```
+
+### Heroku - Update remote server
 
 #### Add Heroku as a Remote
 
