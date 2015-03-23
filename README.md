@@ -1,4 +1,4 @@
-# SIS Custom - [![Build Status](https://travis-ci.org/ucberkeley/sis-custom-build.svg?branch=master)](https://travis-ci.org/ucberkeley/sis-custom-build)
+# SIS Custom - [![Build Status](https://travis-ci.org/ucberkeley/sis-custom-build.svg?branch=master)](https://travis-ci.org/ucberkeley/sis-custom-build) [![Dependency Status](https://david-dm.org/ucberkeley/sis-custom-build)](https://david-dm.org/ets-berkeley-edu/calcentral#info=devDependencies)
 
 Serve the assets for [sis-custom](https://github.com/ucberkeley/sis-custom)
 
