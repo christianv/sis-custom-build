@@ -3,7 +3,7 @@
   "version": "0.0.2",
   "description": "Serve the assets for sis-custom",
   "scripts": {
-    "build": "gulp build"
+    "build": "echo 1 && gulp build"
   },
   "repository": {
     "type": "git",
