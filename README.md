@@ -35,7 +35,7 @@ git push heroku master
 #### Config variables
 
 ```
-heroku config:set NODE_ENV=production
+heroku config:set SIS_ENABLE_SSL=1
 ```
 
 ## Contributing

@@ -5,7 +5,7 @@
   var app = express();
   var http = require('http');
   var server = http.createServer(app);
-  var env = process.env.NODE_ENV || 'development';
+  var enableSsl = process.env.SIS_ENABLE_SSL || false;
   var shell = require('shelljs');
   var chalk = require('chalk');
   var serveIndex = require('serve-index');
@@ -21,8 +21,8 @@
     return next();
   };
 
-  // When in production, force SSL
-  if (env === 'production') {
+  // Force SSL when the option is enabled
+  if (enableSsl) {
     app.use(forceSSL);
   }
 
@@ -70,7 +70,7 @@
 
       echo('Copy dist directory');
       shell.cd('..');
-      shell.exec('cp -TRv x-sis-custom/dist dist');
+      shell.exec('cp -Rv x-sis-custom/dist dist');
 
       createZip();
 
