@@ -70,6 +70,7 @@
 
       echo('Copy dist directory');
       shell.cd('..');
+      shell.exec('rm -rf dist');
       shell.exec('cp -Rv x-sis-custom/dist dist');
 
       createZip();
@@ -81,7 +82,7 @@
   };
 
   // Will fire the build command
-  app.post('/api/build', function(req, res) {
+  app.get('/api/build', function(req, res) {
     build();
     res.json({
       'status': 'ok'
