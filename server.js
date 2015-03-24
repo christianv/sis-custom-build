@@ -88,7 +88,7 @@
     });
   });
 
-  // Listen to a ping
+  // Listen to a ping request
   // We use this for uptimerobot
   app.get('/api/ping', function(req, res) {
     res.json({
