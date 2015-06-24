@@ -83,10 +83,10 @@
 
   // Will fire the build command
   app.get('/api/build', function(req, res) {
-    build();
     res.json({
-      'status': 'ok'
+      'status': 'building'
     });
+    build();
   });
 
   // Listen to a ping request
