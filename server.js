@@ -81,13 +81,16 @@
     }
   };
 
-  // Will fire the build command
-  app.get('/api/build', function(req, res) {
+  var buildResponse = function(req, res) {
     res.json({
       'status': 'building'
     });
     build();
-  });
+  };
+
+  // Will fire the build command
+  app.get('/api/build', buildResponse);
+  app.post('/api/build', buildResponse);
 
   // Listen to a ping request
   // We use this for uptimerobot
